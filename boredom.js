@@ -44,7 +44,6 @@ for (var i=1; i < TOTAL_IMAGES; i++) {
 			'/'.blue.bold + String(TOTAL_IMAGES).white.bold + '...'.blue.bold + ' ' +
 			('(' + parseInt(100.0*(i*1.0/TOTAL_IMAGES)) + '% done)').blue);
 
-
 		var delta,
 			result,
 			output,
@@ -52,7 +51,7 @@ for (var i=1; i < TOTAL_IMAGES; i++) {
 
 		result = child_process.spawnSync('compare', [
 			'-metric', 'AE',
-			'-fuzz', '35%',
+			'-fuzz', '30%',
 			prevImage, curr, '/dev/null'
 		], {
 			'encoding': 'utf8'
@@ -61,7 +60,7 @@ for (var i=1; i < TOTAL_IMAGES; i++) {
 		output = result.output;
 		delta = parseInt(output[2]);
 
-		if (delta < 50) {
+		if (delta < 20) {
 			console.log(curr.red.bold + ' is boring '.red +
 				('(' + delta + ')').red.bold);
 			boringImages.push(curr);
