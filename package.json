@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "colors": "^1.1.2",
     "lodash": "^3.10.1"
   },
   "devDependencies": {
