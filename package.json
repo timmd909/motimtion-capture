@@ -1,0 +1,9 @@
+{
+	"name": "motimtion-capture",
+	"description": "Tim's Motion Capture utilities",
+	"version": "0.0.1",
+	"private": true,
+	"dependencies": {
+		"lodash": "^3.10.1"
+	}
+}
