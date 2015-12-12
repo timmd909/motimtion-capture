@@ -29,40 +29,56 @@ if (images.length < 2) {
 	process.exit(50);
 }
 
+var TOTAL_IMAGES = images.length;
+
 //
 // Process all images, looking for "boring" images that
 // have few pixel changes.
 //
-for (var i=1; i < images.length; i++) {
+var boringImages = [],
+		prevImage = images[0];
+for (var i=1; i < TOTAL_IMAGES; i++) {
 	(function () {
+		console.log('Analyzing ' + (i+1) + '/' + TOTAL_IMAGES + '...');
+
 		var delta,
+			result,
 			output,
-			prev = images[i-1],
 			curr = images[i];
 
-		output = child_process.spawnSync('compare', [
+		result = child_process.spawnSync('compare', [
 			'-metric', 'AE',
-			'-fuzz', '50%',
-			prev, curr
-		]);
+			'-fuzz', '35%',
+			prevImage, curr, '/dev/null'
+		], {
+			'encoding': 'utf8'
+		});
 
-		delta = parseInt(output);
+		output = result.output;
+		delta = parseInt(output[2]);
 
-//		output = child_process.spawnSync('compare', {
-//			'-metric', 'MAE',
-//			prev, curr
-//		});
-//		deltaMAE = parseInt(output);
+		console.log(prevImage + ' -> ' + curr + ' delta: ', delta);
 
-		if (delta < 1000) {
-			// this image is boring, rename it as such
-			var oldName = curr.match(/^(.+)\.(jpeg|jpg)$/),
-				newName = oldName[1] + '-BORING.' + oldName[2];
-
-			fs.renameSync(
-				path.join(process.cwd(), curr),
-				path.join(process.cwd(), newName)
-			);
+		if (delta < 50) {
+			boringImages.push(curr);
+		} else {
+			// save this image as the previously updated image
+			prevImage = curr;
 		}
+
 	})();
 } // for(...)
+
+//
+// Rename all boring images
+//
+console.log('Found ' + boringImages.length + ' boring images');
+_.forEach(boringImages, function (boringImage) {
+	var oldName = boringImage.match(/^(.+)\.(jpeg|jpg)$/),
+		newName = oldName[1] + '-BORING.' + oldName[2];
+
+	fs.renameSync(
+		path.join(process.cwd(), boringImage),
+		path.join(process.cwd(), newName)
+	);
+});
